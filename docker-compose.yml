@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+
+  pgdb:
+    container_name: pgdb
+    image: postgres:13.1
+    env_file: ./pgdb/db.env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+  nginx:
+    container_name: nginx
+    build: ./nginx
+    volumes:
+      - static:/static
+      - media:/media
+    ports:
+      - 80:80
+
+  django:
+    container_name: django
+    build: ./django_app
+    env_file: ./django_app/django.env
+    volumes:
+      - static:/static
+      - media:/media
+      - ./django_app:/app
+    depends_on:
+      - pgdb
+      - nginx
+
+volumes:
+  postgres_data:
+  static:
+  media:
